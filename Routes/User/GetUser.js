@@ -2,7 +2,7 @@ const router = require('express').Router()
 const User = require('../../Models/User')
 
 // Endpoint to get user information 
-router.get('/get/:id', (req, res)=> {
+router.get('/:id', (req, res)=> {
   const id = req.params.id;
   let success = false;
 
@@ -10,7 +10,7 @@ router.get('/get/:id', (req, res)=> {
     // find user in database 
     User.findById(id).select('-password').then((user) => {
       if(!user) {
-        return res.status(404).json({success, message: 'User not found'})
+        return res.status(404).json({success, error: 'User not found'})
       }  
 
       success = true;
@@ -18,8 +18,8 @@ router.get('/get/:id', (req, res)=> {
     })
   } catch(error) {
     if(error){
-      console.error(error);
-      res.status(501).json({success, error})
+      console.error('Error Fetching user: ', error);
+      res.status(501).json({success, error: "Error occurred while Fetching user info"})
     }
   }
 })
