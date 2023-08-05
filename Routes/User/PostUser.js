@@ -6,7 +6,7 @@ const bcrypt = require('bcrypt')
 const generateToken = require('../../Middlewares/GenerateToken');
 
 // Endpoint to create a user 
-router.post('/create', [
+router.post('/', [
   body('name', 'Name must contain alphabets only').isAlpha()
     .isLength({ min: 3 }).withMessage('Name must contain minimum three letters'),
   body('email', 'Email is not valid').isEmail(),
@@ -27,7 +27,7 @@ router.post('/create', [
   // send errors as response if available 
   if (!errors.isEmpty()) {
     console.log(errors.array());
-    return res.status(400).json(success, errors.array());
+    return res.status(400).json({success, error:errors.array()});
   }
 
   try {
@@ -35,7 +35,7 @@ router.post('/create', [
     const userExists = await User.findOne({ email })
 
     if (userExists) {
-      return res.status(409).json({ success, message: 'User already exists with this email' })
+      return res.status(409).json({ success, error: 'User already exists with this email' })
     }
 
     // generate salt for the password 
@@ -49,17 +49,22 @@ router.post('/create', [
       name: name,
       email: email,
       password: hash,
-    }).then(async (user) => {
+    }).then((user) => {
       // generate jwt token 
-      const token = await generateToken(user.id)
+      const payload = {
+        id: user.id,
+        name,
+        email,
+      }
+      const token = generateToken(payload)
 
       success = true;
       res.status(200).json({ success, message: 'Successfully created account', token });
     })
   } catch (error) {
     if(error) {
-      console.error(error)
-      res.status(500).json({success, error})
+      console.error('Error creating account: ', error)
+      res.status(500).json({success, error: 'Error occurred while creating account'})
     }
   }
 })
