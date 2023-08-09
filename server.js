@@ -1,10 +1,14 @@
 const express = require('express')
 const connectToMongo = require('./db')
-const User = require('./Routes/User/User')
+// const User = require('./Routes/User/User')
 const Image = require('./Routes/Image/Image')
 const app = express();
 const port = 80 || process.env.PORT;
+const cors = require('cors')
+const fileUpload = require('express-fileupload')
 
+app.use(cors());
+app.use(fileUpload())
 // middleware to parse incoming request body 
 app.use(express.json());
 
@@ -17,7 +21,7 @@ app.get('/', (req, res)=> {
 })
 
 // API routes 
-app.use('/api/user', User);
+// app.use('/api/user', User);
 app.use('/api/image', Image);
 
 // listening to app 
