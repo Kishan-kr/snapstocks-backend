@@ -6,14 +6,16 @@ const imageSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
   },
-  publicId : String,
-  imageUrl : String,
-  description : String,
+  publicId : {type: String, required: true},
+  imageUrl : {type: String, required: true},
+  description : {type: String, required: true},
+  height: Number,
+  width: Number,
   location : String,
-  likes : mongoose.Types.Decimal128,
-  views : mongoose.Types.Decimal128,
-  downloads : mongoose.Types.Decimal128,
-  tags : String,
+  likes : {type: Number, default: 0},
+  views : {type: Number, default: 0},
+  downloads : {type: Number, default: 0},
+  tags : [String],
   
   date : {
     type : Date,

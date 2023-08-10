@@ -28,13 +28,16 @@ router.post('/', fetchUserData, [
   try {
     // upload the image to cloudinary 
     const cloudinaryResult = await uploadToCloudinary(req.files.image.data);
-
+    const { public_id, secure_url, width, height } = cloudinaryResult;
+    
     // create new image document in DB 
     const image = {
       userId,
-      publicId: cloudinaryResult.public_id,
-      imageUrl: cloudinaryResult.secure_url,
+      publicId: public_id,
+      imageUrl: secure_url,
       description: req.body.description,
+      width,
+      height,
       ...req.body
     }
     
