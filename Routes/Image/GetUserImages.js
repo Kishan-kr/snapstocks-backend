@@ -13,7 +13,7 @@ router.get('/:userId', async (req, res) => {
     const skipCount = (page - 1) * itemsPerPage;
 
     // Find images of a user in DB with pagination
-    const images = await Image.find({ userId }).skip(skipCount).limit(itemsPerPage)
+    const images = await Image.find({ user: userId }).skip(skipCount).limit(itemsPerPage)
 
     if (!images || images.length <= 0) {
       return res.status(404).json({ success, error: 'Images not found' });

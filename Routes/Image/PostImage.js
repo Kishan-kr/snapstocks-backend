@@ -32,7 +32,7 @@ router.post('/', fetchUserData, [
     
     // create new image document in DB 
     const image = {
-      userId,
+      user: userId,
       publicId: public_id,
       imageUrl: secure_url,
       description: req.body.description,
