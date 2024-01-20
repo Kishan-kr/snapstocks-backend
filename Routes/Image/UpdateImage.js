@@ -1,19 +1,21 @@
-const fetchUserData = require('../../Middlewares/FetchUserData');
+const authenticate = require('../../Middlewares/Authenticate');
 const Image = require('../../Models/Image');
 
 const router = require('express').Router()
 
-// Endpoint to Upload an image 
-router.put('/:id', fetchUserData, async (req, res) => {
+//@description     Update an image
+//@route           PUT /api/images/imageid
+//@access          Protected
+router.put('/:id', authenticate, async (req, res) => {
+  const user = req.user.id;
   const id = req.params.id;
-  let success = false;
 
   try {
     // Find the image in DB 
-    const image = await Image.findById(id);
+    const image = await Image.findOne({id, user});
 
     if(!image) {
-      return res.status(400).json({success, error: 'Image not found!'})
+      return res.status(404).json({ error: 'Image not found'})
     }
     
     // Update the desired fields based on req.body
@@ -28,12 +30,11 @@ router.put('/:id', fetchUserData, async (req, res) => {
     }
     
     await image.save();
-    success = true;
-    res.status(200).json({success, image})
+    res.status(200).json({message: 'Image updated', image})
 
   } catch (error) {
     console.error('Error updating image: ', error)
-    res.status(500).json({success, error: 'Error while updating image'})
+    res.status(500).json({ error: 'Server error'})
   }
 
 })

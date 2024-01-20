@@ -2,11 +2,11 @@ const jwt = require('jsonwebtoken')
 require('dotenv').config()
 const secret = process.env.SECRET
 
-const fetchUserData = (req, res, next) => {
-  let token = req.header('token');
+const authenticate = (req, res, next) => {
+  let token = req.session;
   let success = false;
 
-  // Return error is token is not available 
+  // Return error if token is not available 
   if(!token) {
     return res.status(401).json({success, error : "Token is not available"})
   }
@@ -21,4 +21,4 @@ const fetchUserData = (req, res, next) => {
   })
 }
 
-module.exports = fetchUserData;
+module.exports = authenticate;

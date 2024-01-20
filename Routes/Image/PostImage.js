@@ -1,28 +1,29 @@
 const { body, validationResult, check } = require('express-validator');
-const fetchUserData = require('../../Middlewares/FetchUserData');
 const Image = require('../../Models/Image');
-const {uploadToCloudinary} = require('../../Middlewares/ConfigCloudinary');
+const {uploadToCloudinary} = require('../../Utils/ConfigCloudinary');
+const authenticate = require('../../Middlewares/Authenticate');
 
 const router = require('express').Router()
 
-// Endpoint to Upload an image 
-router.post('/', fetchUserData, [
-  body('description', 'desribe your image').notEmpty(),
+//@description     Upload an image
+//@route           POST /api/images/
+//@access          Protected
+router.post('/', authenticate, [
+  body('tags', 'Add alteast one tag').notEmpty(),
   // Validate the upload file 
   check('image').custom((value, { req }) => {
     if (!req.files || !req.files.image) {
-      throw new Error('Please upload a file');
+      throw new Error('Please upload an image');
     }
     return true;
   })
 ], async (req, res) => {
   const userId = req.user.id;
-  let success = false;
 
   // check for validation errors 
   const errors = validationResult(req);
   if(!errors.isEmpty()) {
-    return res.status(400).json({success, error: errors.array()})
+    return res.status(400).json({ error: errors.array()})
   }
 
   try {
@@ -43,15 +44,14 @@ router.post('/', fetchUserData, [
     
    Image.create(image).then((uploadedImage) => {
     if(!uploadedImage) {
-      return res.status(400).json({success, error: 'Error while uploading image'})
+      return res.status(400).json({ error: 'Unable to upload'})
     }
 
-    success = true;
-    res.status(200).json({success, uploadedImage})
+    res.status(200).json({message: 'Image uploaded', uploadedImage})
    }) 
   } catch (error) {
     console.error('Error uploading image: ', error)
-    res.status(500).json({success, error: 'Error while uploading image'})
+    res.status(500).json({ error: 'Server error'})
   }
 
 })
